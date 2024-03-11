@@ -1,1 +1,6 @@
+# For weewx-mqtt
 paho-mqtt
+configobj
+
+# For weewx-intercept
+pypcap

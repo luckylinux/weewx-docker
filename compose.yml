@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  weewx:
+    image: localhost/weewx:debian-latest
+    container_name: weewx
+    init: true
+    restart: "unless-stopped"
+#    user: root
+    networks:
+      - podman
+    volumes:
+      - ~/containers/config/weewx:/etc/weewx
+      - ~/containers/data/weewx:/data
+    env_file:
+      - .env
+    environment:
+      - TIMEZONE=UTC
+#      - WEEWX_UID=root
+#      - WEEWX_GID=root
+#    devices:
+#      - "/dev/ttyUSB0:/dev/ttyUSB0"
+
+networks:
+  podman:
+    external: true
