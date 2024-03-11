@@ -1,0 +1,72 @@
+FROM debian:latest
+
+ARG WEEWX_VERSION="5.0.2"
+ARG WEEWX_PATH="/opt/weewx"
+ARG VENV_PATH="/opt/venv"
+
+RUN mkdir "${WEEWX_PATH}"
+WORKDIR "${WEEWX_PATH}"
+COPY requirements.txt requirements.txt
+RUN apt-get update
+RUN apt-get install -y python3 python3-pip python3-venv bash
+#RUN apt-get install -y bash
+#RUN apt-get install rrdtool
+
+# Change Shell
+RUN chsh -s /bin/bash root
+RUN export SHELL="/bin/bash"
+RUN ln -sf /bin/bash /bin/sh
+
+# set ENV to execute startup scripts
+ENV ENV /etc/profile
+
+# Create venv
+RUN python3 -m venv venv
+
+# Set PATH Variable to include venv
+ENV PATH="${VENV_PATH}/bin:$PATH"
+
+# Install required Packages
+RUN pip install -r requirements.txt
+
+# Define Archive File
+ARG WEEWX_ARCHIVE="weewx-${WEEWX_VERSION}.tar.gz"
+ARG WEEWX_MQTT_ARCHIVE="weewx-mqtt.zip"
+ARG WEEWX_INTERCEPTOR_ARCHIVE="weewx-interceptor.zip"
+
+# Change to /tmp
+WORKDIR /tmp
+
+# Download Packages
+RUN wget -O "${WEEWX_ARCHIVE}" "https://weewx.com/downloads/released_versions/${WEEWX_ARCHIVE}"
+RUN wget -O "${WEEWX_MQTT_ARCHIVE}" https://github.com/matthewwall/weewx-mqtt/archive/master.zip
+RUN wget -O "${WEEWX_INTERCEPTOR_ARCHIVE}" https://github.com/matthewwall/weewx-interceptor/archive/master.zip
+
+# Verify Hashes
+# ...
+
+# Install Packages
+RUN tar xvf ${WEEWX_ARCHIVE} -C ${WEEWX_PATH}
+
+# Install Extensions
+RUN ${WEEWX_PATH}/bin/wee_extension --install /tmp/${WEEWX_MQTT_ARCHIVE}
+RUN ${WEEWX_PATH}/bin/wee_extension --install /tmp/${WEEWX_INTERCEPTOR_ARCHIVE}
+
+# Activate venv
+#RUN source venv/bin/activate
+
+
+# Export Web Port
+#EXPOSE 5000
+
+# Copy required Files
+#COPY app/* .
+#COPY README.md .
+
+# Run the Main App
+#CMD ["python", "-u", "app.py"]
+
+# Copy and Execute Script for Installation and Initialization of App
+COPY docker-entrypoint.sh /opt/
+RUN chmod +x /opt/docker-entrypoint.sh
+ENTRYPOINT ["/opt/docker-entrypoint.sh"]
