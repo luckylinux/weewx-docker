@@ -6,15 +6,14 @@ ARG WEEWX_CONF_PATH="/etc/weewx"
 ARG VENV_PATH="/opt/venv"
 
 # Create Directories
-RUN mkdir "${WEEWX_PATH}"
-RUN mkdir "${WEEWX_CONF_PATH}"
-RUN mkdir "${VENV_PATH}"
-
-WORKDIR "${WEEWX_PATH}"
-COPY requirements.txt requirements.txt
+RUN mkdir -p "${WEEWX_PATH}"
+RUN mkdir -p "${WEEWX_CONF_PATH}"
+RUN mkdir -p "${VENV_PATH}"
 
 RUN apk update
 RUN apk add python3 py3-pip bash wget curl unzip libpcap-dev shadow
+#RUN apk add rsyslog
+RUN apk add inetutils-syslogd
 #RUN apk add install rrdtool
 
 # Change Shell

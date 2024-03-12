@@ -103,3 +103,16 @@ In this way it's always possible to enter the Container to issue "manual command
 ```
 podman exec -it weewx /bin/bash
 ```
+
+# Initial Configuration
+Enter the Container Shell:
+```
+podman exec -it weewx /bin/bash
+```
+
+Perform the Initial Configuration using the `weewx.conf` Template provided by the Installer:
+```
+wee_config --install --output /etc/weewx/weewx.conf --dist-config /opt/weewx/weewx.conf
+```
+
+And reply to the Prompts.
