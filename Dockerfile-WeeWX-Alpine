@@ -1,0 +1,79 @@
+FROM localhost/weewx-base:alpine-latest
+
+ARG WEEWX_VERSION="4.10.2" # Latest supported by the extensions
+#ARG WEEWX_VERSION="5.0.2" # ** This breaks the extensions **
+
+ARG WEEWX_PATH="/opt/weewx"
+#ARG WEEWX_HOME_DIR="/home/weewx"
+ARG WEEWX_CONF_PATH="/etc/weewx"
+ARG VENV_PATH="/opt/venv"
+
+#RUN mkdir "${WEEWX_PATH}"
+#WORKDIR "${WEEWX_PATH}"
+#COPY requirements.txt requirements.txt
+#RUN apk update
+#RUN apk add python3 py3-pip bash wget curl unzip libpcap-dev
+#RUN apk add install rrdtool
+
+# Change Shell
+#RUN chsh -s /bin/bash root
+#RUN export SHELL="/bin/bash"
+#RUN ln -sf /bin/bash /bin/sh
+
+# set ENV to execute startup scripts
+#ENV ENV /etc/profile
+
+# Create venv
+RUN python3 -m venv "${VENV_PATH}"
+
+# Set PATH Variable to include venv
+ENV PATH="${VENV_PATH}/bin:$PATH"
+
+# Activate venv
+RUN source "${VENV_PATH}/bin/activate"
+
+# Install required Packages
+RUN pip install -r requirements.txt
+
+# Define Archive File
+ARG WEEWX_ARCHIVE="weewx-${WEEWX_VERSION}.tar.gz" # 4.x has .tar.gz extension
+#ARG WEEWX_ARCHIVE="weewx-${WEEWX_VERSION}.tgz" # 5.x has .tgz extension
+ARG WEEWX_MQTT_ARCHIVE="weewx-mqtt.zip"
+ARG WEEWX_INTERCEPTOR_ARCHIVE="weewx-interceptor.zip"
+
+# Change to /tmp
+WORKDIR /tmp
+
+# Download Packages
+RUN wget -O "${WEEWX_ARCHIVE}" "https://weewx.com/downloads/released_versions/${WEEWX_ARCHIVE}"
+RUN wget -O "${WEEWX_MQTT_ARCHIVE}" https://github.com/matthewwall/weewx-mqtt/archive/master.zip
+RUN wget -O "${WEEWX_INTERCEPTOR_ARCHIVE}" https://github.com/matthewwall/weewx-interceptor/archive/master.zip
+
+# Verify Hashes
+# ...
+
+# Install Packages
+RUN tar xvf ${WEEWX_ARCHIVE} --strip-components=1 -C ${WEEWX_PATH}
+
+# Create initial weewx.conf file
+RUN mkdir -p "${WEEWX_CONF_PATH}"
+#RUN touch "${WEEWX_CONF_PATH}/weewx.conf"
+
+# Install Extensions (WeeWX 4.x)
+RUN ${WEEWX_PATH}/bin/wee_extension --install /tmp/${WEEWX_MQTT_ARCHIVE}
+RUN ${WEEWX_PATH}/bin/wee_extension --install /tmp/${WEEWX_INTERCEPTOR_ARCHIVE}
+
+# Install Extensions (WeeWX 5.x)
+#RUN ${WEEWX_PATH}/bin/weectl extension install /tmp/${WEEWX_MQTT_ARCHIVE}
+#RUN ${WEEWX_PATH}/bin/weectl extension install /tmp/${WEEWX_INTERCEPTOR_ARCHIVE}
+
+# Export Web Port
+#EXPOSE 5000
+
+# Set PATH Variable to Include Application
+ENV PATH="${WEEWX_PATH}/bin:${VENV_PATH}/bin:$PATH"
+
+# Copy and Execute Script for Installation and Initialization of App
+COPY docker-entrypoint.sh /opt/
+RUN chmod +x /opt/docker-entrypoint.sh
+ENTRYPOINT ["/opt/docker-entrypoint.sh"]

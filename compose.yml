@@ -4,7 +4,7 @@ services:
   weewx:
     image: localhost/weewx:debian-latest
     container_name: weewx
-    init: true
+#    init: true
     restart: "unless-stopped"
 #    user: root
     networks:

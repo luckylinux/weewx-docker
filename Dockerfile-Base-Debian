@@ -1,0 +1,26 @@
+FROM debian:latest
+
+ARG WEEWX_PATH="/opt/weewx"
+#ARG WEEWX_HOME_DIR="/home/weewx"
+ARG WEEWX_CONF_PATH="/etc/weewx"
+ARG VENV_PATH="/opt/venv"
+
+# Create Directories
+RUN mkdir "${WEEWX_PATH}"
+RUN mkdir "${WEEWX_CONF_PATH}"
+RUN mkdir "${VENV_PATH}"
+
+WORKDIR "${WEEWX_PATH}"
+COPY requirements.txt requirements.txt
+
+RUN apt-get update
+RUN apt-get install -y python3 python3-pip python3-venv bash wget curl unzip libpcap-dev
+#RUN apk add install rrdtool
+
+# Change Shell
+RUN chsh -s /bin/bash root
+RUN export SHELL="/bin/bash"
+RUN ln -sf /bin/bash /bin/sh
+
+# set ENV to execute startup scripts
+ENV ENV /etc/profile
