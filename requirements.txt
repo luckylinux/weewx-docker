@@ -3,4 +3,4 @@ paho-mqtt
 configobj
 
 # For weewx-intercept
-pypcap
+#pypcap # requires libpcap-dev and gcc to be installed

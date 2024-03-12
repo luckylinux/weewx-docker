@@ -1,0 +1,26 @@
+FROM alpine:latest
+
+ARG WEEWX_PATH="/opt/weewx"
+#ARG WEEWX_HOME_DIR="/home/weewx"
+ARG WEEWX_CONF_PATH="/etc/weewx"
+ARG VENV_PATH="/opt/venv"
+
+# Create Directories
+RUN mkdir "${WEEWX_PATH}"
+RUN mkdir "${WEEWX_CONF_PATH}"
+RUN mkdir "${VENV_PATH}"
+
+WORKDIR "${WEEWX_PATH}"
+COPY requirements.txt requirements.txt
+
+RUN apk update
+RUN apk add python3 py3-pip bash wget curl unzip libpcap-dev shadow
+#RUN apk add install rrdtool
+
+# Change Shell
+RUN chsh -s /bin/bash root
+RUN export SHELL="/bin/bash"
+RUN ln -sf /bin/bash /bin/sh
+
+# set ENV to execute startup scripts
+ENV ENV /etc/profile
