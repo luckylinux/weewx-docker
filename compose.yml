@@ -9,13 +9,16 @@ services:
 #    user: root
     networks:
       - podman
+    ports:
+      - 8080:8080 # Must be exposed to make it accessible on the host
     volumes:
       - ~/containers/config/weewx:/etc/weewx
-      - ~/containers/data/weewx:/data
+      - ~/containers/data/weewx:/home/weewx
     env_file:
       - .env
     environment:
       - TIMEZONE=UTC
+      - ENABLE_INFINITE_LOOP=no # Set yes for debugging purposes
 #      - WEEWX_UID=root
 #      - WEEWX_GID=root
 #    devices:

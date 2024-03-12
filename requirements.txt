@@ -1,6 +1,9 @@
 # For weewx-mqtt
 paho-mqtt
 configobj
-
-# For weewx-intercept
-#pypcap # requires libpcap-dev and gcc to be installed
+pyserial
+pyusb
+semver
+setuptools
+wheel
+pyephem
