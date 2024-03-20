@@ -1,4 +1,4 @@
-FROM localhost/weewx-base:alpine-latest
+FROM localhost/weewx-base:debian-latest
 
 ARG WEEWX_VERSION="4.10.2" # Latest supported by the extensions
 #ARG WEEWX_VERSION="5.0.2" # ** This breaks the extensions **
@@ -7,15 +7,18 @@ ARG WEEWX_PATH="/opt/weewx"
 #ARG WEEWX_HOME_DIR="/home/weewx"
 ARG WEEWX_CONF_PATH="/etc/weewx"
 ARG VENV_PATH="/opt/venv"
+ARG PATCHES_PATH="/opt/patches"
 
 # Create Directories
 RUN mkdir -p "${WEEWX_PATH}"
 RUN mkdir -p "${WEEWX_CONF_PATH}"
 RUN mkdir -p "${VENV_PATH}"
+RUN mkdir -p "${PATCHES_PATH}"
 
 # Change Directory and Copy requirements.txt
 WORKDIR "/opt"
 COPY requirements.txt requirements.txt
+COPY patches/* "${PATCHES_PATH}/"
 
 # Create venv
 RUN python3 -m venv "${VENV_PATH}"
@@ -61,8 +64,11 @@ RUN ${WEEWX_PATH}/bin/wee_extension --install /tmp/${WEEWX_INTERCEPTOR_ARCHIVE}
 #RUN ${WEEWX_PATH}/bin/weectl extension install /tmp/${WEEWX_MQTT_ARCHIVE}
 #RUN ${WEEWX_PATH}/bin/weectl extension install /tmp/${WEEWX_INTERCEPTOR_ARCHIVE}
 
+# Apply Patches
+RUN for p in ${PATCHES_PATH}/*.patch; do patch -d/ -p0 < $p; done
+
 # Export Web Port
-#EXPOSE 5000
+EXPOSE 8080
 
 # Set PATH Variable to Include Application
 ENV PATH="${WEEWX_PATH}/bin:${VENV_PATH}/bin:$PATH"
