@@ -4,7 +4,8 @@
 engine=${1-"podman"}
 
 # Container Name
-name=$(cat ./name.txt)
+#name=$(cat ./name.txt)
+name="weewx4"
 
 # Options
 # Use --no-cache when e.g. updating docker-entrypoint.sh and images don't get updated as they should
@@ -18,12 +19,13 @@ bases+=("Alpine")
 bases+=("Debian")
 
 # Mandatory Tag
-tag=$(cat ./tag.txt)
+#tag=$(cat ./tag.txt)
+tag=$(date +%Y%m%d)
 
 for base in "${bases[@]}"
 do
     # Select Dockerfile
-    buildfile="Dockerfile-WeeWX-$base"
+    buildfile="Dockerfile-WeeWX4-$base"
 
     # Check if they are set
     if [[ ! -v name ]] || [[ ! -v tag ]]

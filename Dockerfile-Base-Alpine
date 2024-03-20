@@ -14,6 +14,8 @@ RUN apk update
 RUN apk add python3 py3-pip bash wget curl unzip libpcap-dev shadow
 #RUN apk add rsyslog
 RUN apk add inetutils-syslogd
+RUN apk add gcc
+RUN apk add python3-dev libstdc++ patch
 #RUN apk add install rrdtool
 
 # Change Shell

@@ -6,4 +6,3 @@ pyusb
 semver
 setuptools
 wheel
-pyephem

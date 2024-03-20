@@ -1,0 +1,11 @@
+--- /opt/weewx/bin/user/interceptor.py	2024-03-20 17:04:22.591983532 +0000
++++ /opt/weewx/bin/user/interceptor.py	2024-03-20 17:04:11.741946901 +0000
+@@ -610,7 +610,7 @@
+         def do_POST(self):
+             # get the payload from an HTTP POST
+             length = int(self.headers["Content-Length"])
+-            data = str(self.rfile.read(length))
++            data = self.rfile.read(length).decode("utf-8")
+             logdbg('POST: %s' % _obfuscate_passwords(data))
+             Consumer.queue.put(data)
+             self.reply()

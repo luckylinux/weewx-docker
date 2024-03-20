@@ -4,7 +4,8 @@
 engine=${1-"podman"}
 
 # Container Name
-name="weewx-base"
+#name=$(cat ./name.txt)
+name="weewx5"
 
 # Options
 # Use --no-cache when e.g. updating docker-entrypoint.sh and images don't get updated as they should
@@ -24,7 +25,7 @@ tag=$(date +%Y%m%d)
 for base in "${bases[@]}"
 do
     # Select Dockerfile
-    buildfile="Dockerfile-Base-$base"
+    buildfile="Dockerfile-WeeWX5-$base"
 
     # Check if they are set
     if [[ ! -v name ]] || [[ ! -v tag ]]
