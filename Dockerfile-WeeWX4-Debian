@@ -30,7 +30,7 @@ ENV PATH="${VENV_PATH}/bin:$PATH"
 RUN source "${VENV_PATH}/bin/activate"
 
 # Install required Packages
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Define Archive File
 ARG WEEWX_ARCHIVE="weewx-${WEEWX_VERSION}.tar.gz" # 4.x has .tar.gz extension

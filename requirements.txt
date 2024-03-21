@@ -6,3 +6,5 @@ pyusb
 semver
 setuptools
 wheel
+pillow
+Cheetah3
