@@ -9,6 +9,13 @@ echo "Launching docker-entrypoint.sh"
 # set timezone using environment
 ln -snf /usr/share/zoneinfo/"${TIMEZONE:-UTC}" /etc/localtime
 
+# Set /opt/weewx/weewx.conf to be a symlink if it isn't already
+if [[ ! -L "/opt/weewx/weewx.conf"  ]]
+then
+    rm -f /etc/weewx/weewx.conf
+    ln -s /etc/weewx/weewx.conf /opt/weewx/weewx.conf
+fi
+
 # start the syslog daemon as root
 /sbin/syslogd -n -S -O - &
 
