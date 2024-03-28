@@ -19,6 +19,9 @@ RUN apt-get -y install gcc
 RUN apt-get -y install python3-dev libstdc++-12-dev patch zlib1g zlib1g-dev libjpeg-dev libc++-dev
 RUN apt-get -y install libfreetype6 libfreetype6-dev
 
+# Clean APT Cache
+RUN apt-get clean
+
 # Change Shell
 RUN chsh -s /bin/bash root
 RUN export SHELL="/bin/bash"

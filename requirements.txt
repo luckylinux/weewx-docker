@@ -1,5 +1,5 @@
 # For weewx-mqtt
-paho-mqtt
+paho-mqtt==1.6.1
 configobj
 pyserial
 pyusb
