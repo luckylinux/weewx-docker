@@ -4,4 +4,4 @@
 ./build_base.sh
 
 # Build WeeWX(s)
-./build_weewx.sh
+./build_weewx_4.sh
