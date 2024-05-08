@@ -10,16 +10,24 @@ RUN mkdir -p "${WEEWX_PATH}"
 RUN mkdir -p "${WEEWX_CONF_PATH}"
 RUN mkdir -p "${VENV_PATH}"
 
-RUN apk update
-RUN apk add --no-cache python3 py3-pip bash wget curl unzip libpcap-dev shadow
-#RUN apk add rsyslog
-RUN apk add --no-cache inetutils-syslogd
-RUN apk add --no-cache gcc
-RUN apk add --no-cache python3-dev libstdc++ patch zlib zlib-dev lzlib libjpeg jpeg jpeg-dev libc++-dev klibc-dev libstdc++-dev
-#RUN apk add --virtual build-deps gcc python3-dev musl-dev
-RUN apk add --no-cache gcc python3-dev musl-dev
-RUN apk add --no-cache freetype freetype-dev
-#RUN apk add install rrdtool
+# Update Sources
+# Install required Packages
+RUN --mount=type=cache,mode=0777,target=/var/cache/apk,sharing=locked \
+    --mount=type=cache,mode=0777,target=/var/lib/apk,sharing=locked \
+    apk update && \
+    apk add python3 py3-pip bash wget curl unzip libpcap-dev shadow && \
+    apk add inetutils-syslogd && \
+    apk add python3-dev libstdc++ patch zlib zlib-dev lzlib libjpeg jpeg jpeg-dev libc++-dev klibc-dev libstdc++-dev && \
+    apk add gcc python3-dev musl-dev && \
+    apk add freetype freetype-dev
+
+# Not Currently Enabled Packages
+#RUN --mount=type=cache,mode=0777,target=/var/cache/apk,sharing=locked \
+#    --mount=type=cache,mode=0777,target=/var/lib/apk,sharing=locked \
+#    apk update && \
+#    apk add --virtual build-deps gcc python3-dev musl-dev && \
+#    apk add rsyslog && \
+#    apk add install rrdtool
 
 # Change Shell
 RUN chsh -s /bin/bash root

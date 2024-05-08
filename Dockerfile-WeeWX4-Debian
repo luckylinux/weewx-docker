@@ -15,9 +15,13 @@ RUN mkdir -p "${WEEWX_CONF_PATH}"
 RUN mkdir -p "${VENV_PATH}"
 RUN mkdir -p "${PATCHES_PATH}"
 
+# Use Cache (Keep downloaded Files)
+# They are stored in the Cache directory, NOT in the final Container Image
+RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+
 # Change Directory and Copy requirements.txt
 WORKDIR "/opt"
-COPY requirements.txt requirements.txt
+COPY requirements.txt "${WEEWX_PATH}/requirements.txt"
 COPY patches/* "${PATCHES_PATH}/"
 
 # Create venv
@@ -30,7 +34,9 @@ ENV PATH="${VENV_PATH}/bin:$PATH"
 RUN source "${VENV_PATH}/bin/activate"
 
 # Install required Packages
-RUN pip install --no-cache-dir -r requirements.txt
+RUN --mount=type=cache,mode=0777,target=/var/lib/pip,sharing=locked \
+    pip install --cache-dir /var/lib/pip -r "${WEEWX_PATH}/requirements.txt"
+
 
 # Define Archive File
 ARG WEEWX_ARCHIVE="weewx-${WEEWX_VERSION}.tar.gz" # 4.x has .tar.gz extension
@@ -43,14 +49,14 @@ WORKDIR /tmp
 
 # Download Packages
 RUN wget -O "${WEEWX_ARCHIVE}" "https://weewx.com/downloads/released_versions/${WEEWX_ARCHIVE}"
-RUN wget -O "${WEEWX_MQTT_ARCHIVE}" https://github.com/matthewwall/weewx-mqtt/archive/master.zip
-RUN wget -O "${WEEWX_INTERCEPTOR_ARCHIVE}" https://github.com/matthewwall/weewx-interceptor/archive/master.zip
+RUN wget -O "${WEEWX_MQTT_ARCHIVE}" "https://github.com/matthewwall/weewx-mqtt/archive/master.zip"
+RUN wget -O "${WEEWX_INTERCEPTOR_ARCHIVE}" "https://github.com/matthewwall/weewx-interceptor/archive/master.zip"
 
 # Verify Hashes
 # ...
 
 # Install Packages
-RUN tar xvf ${WEEWX_ARCHIVE} --strip-components=1 -C ${WEEWX_PATH}
+RUN tar xf ${WEEWX_ARCHIVE} --strip-components=1 -C ${WEEWX_PATH}
 
 # Create initial weewx.conf file
 RUN mkdir -p "${WEEWX_CONF_PATH}"

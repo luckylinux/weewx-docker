@@ -10,17 +10,27 @@ RUN mkdir -p "${WEEWX_PATH}"
 RUN mkdir -p "${WEEWX_CONF_PATH}"
 RUN mkdir -p "${VENV_PATH}"
 
-RUN apt-get update
-RUN apt-get install -y python3 python3-pip python3-venv bash wget curl unzip libpcap-dev
-#RUN apt-get --no-install-recommends -y install rsyslog
-RUN apt-get -y install busybox-syslogd
-#RUN apk add install rrdtool
-RUN apt-get -y install gcc
-RUN apt-get -y install python3-dev libstdc++-12-dev patch zlib1g zlib1g-dev libjpeg-dev libc++-dev
-RUN apt-get -y install libfreetype6 libfreetype6-dev
+# Use Cache (Keep downloaded Files)
+# They are stored in the Cache directory, NOT in the final Container Image
+RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
 
-# Clean APT Cache
-RUN apt-get clean
+# Update Sources
+# Install required Packages
+RUN --mount=type=cache,mode=0777,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,mode=0777,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
+    apt-get install -y python3 python3-pip python3-venv bash wget curl unzip libpcap-dev && \
+    apt-get -y install busybox-syslogd && \
+    apt-get -y install gcc && \
+    apt-get -y install python3-dev libstdc++-12-dev patch zlib1g zlib1g-dev libjpeg-dev libc++-dev && \
+    apt-get -y install libfreetype6 libfreetype6-dev
+
+# Not Currently Enabled Packages
+#RUN --mount=type=cache,mode=0777,target=/var/cache/apt,sharing=locked \
+#    --mount=type=cache,mode=0777,target=/var/lib/apt,sharing=locked \
+#    apt-get update && \
+#    apt-get --no-install-recommends -y install rsyslog && \
+#    apt-get install -y install rrdtool
 
 # Change Shell
 RUN chsh -s /bin/bash root
